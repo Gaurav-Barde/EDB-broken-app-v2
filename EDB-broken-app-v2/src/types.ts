@@ -1,3 +1,6 @@
+import Pokemon from './pages/pokemon/[name]';
+import { tableHeadings } from './utils/constants';
+
 export type PokemonName = {
   english: string;
   japanese: string;
@@ -14,10 +17,15 @@ export type PokemonStats = {
   Speed: string;
 };
 
+type TypeOfHeadings = typeof tableHeadings[number];
+
 export type Pokemon = {
+  id: number;
   name: PokemonName;
   type: string[];
-  stats: PokemonStats;
+  stats: {
+    [Property in TypeOfHeadings]: string;
+  };
 };
 
 export type SerializedPokemon = Omit<Pokemon, 'name'> & {

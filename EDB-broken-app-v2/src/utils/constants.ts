@@ -1,0 +1,1 @@
+export const tableHeadings = ['HP', 'Attack', 'Defense', 'Sp. Attack', 'Sp. Defense', 'Speed'] as const;

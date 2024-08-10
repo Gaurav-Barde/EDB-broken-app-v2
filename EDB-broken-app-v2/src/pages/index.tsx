@@ -16,15 +16,30 @@ type Views = 'cards' | 'table' | 'list';
 const Home = ({ version }: { version: string }) => {
   const [search, setSearch] = useState('');
   const [view, setView] = useState<Views>('cards');
+  const [sortColumn, setSortColumn] = useState<string | null>(null);
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
 
-  const { data: response } = useSWR<AxiosResponse<SerializedPokemon[]>>(`pokemons-${search}`, () =>
-    axios(`/api/pokemons`),
+  const { data: response } = useSWR<AxiosResponse<SerializedPokemon[]>>(
+    `pokemons-${search}-${sortColumn}-${sortOrder}`,
+    () => axios(`/api/pokemons?name=${search}&sortColumn=${sortColumn}&sortOrder=${sortOrder}`),
   );
 
-  const handleSearch = useCallback((event) => {
+  const handleSearch = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
     setView('cards');
     setSearch(event.target.value);
   }, []);
+
+  const handleSort = useCallback(
+    (column: string) => {
+      if (sortColumn === column) {
+        setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+      } else {
+        setSortColumn(column);
+        setSortOrder('asc');
+      }
+    },
+    [sortColumn, sortOrder],
+  );
 
   const renderContent = () => {
     if (!response) {
@@ -34,7 +49,11 @@ const Home = ({ version }: { version: string }) => {
         </div>
       );
     }
-    return view === 'cards' ? <Cards data={response.data} /> : <Table />;
+    return view === 'cards' ? (
+      <Cards data={response.data} />
+    ) : (
+      <Table data={response.data} onSort={handleSort} />
+    );
   };
 
   return (
